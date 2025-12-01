@@ -1,6 +1,13 @@
 #include <SoftwareSerial.h>
 #include <vector>
 
+enum SensorType {
+    NONE = 0,
+    ACCELEROMETER = 1,
+    STRAIN_GAUGE = 2,
+    LASER_DISTANCE = 3,        
+};
+
 class SerialRS485 : public SerialPIO
 {
 private:
@@ -8,12 +15,6 @@ private:
     int _rxPin;
     int _deRePin;
     int _baudRate;
-    enum SensorType {
-        NONE = 0,
-        ACCELEROMETER = 1,
-        STRAIN_GAUGE = 2,
-        LASER_DISTANCE = 3,        
-    } _sensorType;
 
     void sendByte(uint8_t byte)
     {
@@ -82,40 +83,13 @@ public:
             pinMode(_rxPin, INPUT_PULLUP);
         }
     }
-
-    SensorType getSensorType()
-    {
-        return _sensorType;
-    }
-
-    bool setSensorType(SensorType type)
-    {
-        if (_sensorType == type)
-            return false;
-
-        _sensorType = type;
-        switch (type)
-        {
-            case ACCELEROMETER:
-                setBaudRate(1000000);
-                break;
-            case STRAIN_GAUGE:
-                setBaudRate(115200);
-                break;
-            case LASER_DISTANCE:
-                setBaudRate(115200);
-                break;
-            default:
-                return false; 
-        }
-        return true;
-    }
 };
 
 class RS485Manager
 {
     private:
     std::vector<SerialRS485*> _ports;
+    std::vector<SensorType> _sensorTypes;
 
     public:
     RS485Manager() = default;
@@ -135,6 +109,20 @@ class RS485Manager
         if (index < 0 || index >= _ports.size())
             return nullptr;
         return _ports[index];
+    }
+
+    SensorType getSensorType(int index)
+    {
+        if (index < 0 || index >= _sensorTypes.size())
+            return NONE;
+        return _sensorTypes[index];
+    }
+
+    void setSensorType(int index, SensorType type)
+    {
+        if (index < 0 || index >= _sensorTypes.size())
+            return;
+        _sensorTypes[index] = type;
     }
 
     size_t portCount() const

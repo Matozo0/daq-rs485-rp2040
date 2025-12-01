@@ -6,7 +6,6 @@ RS485Manager rs485Manager;
 const int rxPins[] = {16, 17, 18};
 const int deRePins[] = {15, 14, 13};
 const int txPins[] = {9, 8, 7};
-const int baudRates[] = {19200, 1000000, 1000000};
 const int numPorts = sizeof(rxPins)/sizeof(rxPins[0]);
 
 void setup()

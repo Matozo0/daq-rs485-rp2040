@@ -8,6 +8,12 @@ private:
     int _rxPin;
     int _deRePin;
     int _baudRate;
+    enum SensorType {
+        NONE = 0,
+        ACCELEROMETER = 1,
+        STRAIN_GAUGE = 2,
+        LASER_DISTANCE = 3,        
+    } _sensorType;
 
     void sendByte(uint8_t byte)
     {
@@ -75,6 +81,34 @@ public:
             SerialPIO::begin(baudRate);
             pinMode(_rxPin, INPUT_PULLUP);
         }
+    }
+
+    SensorType getSensorType()
+    {
+        return _sensorType;
+    }
+
+    bool setSensorType(SensorType type)
+    {
+        if (_sensorType == type)
+            return false;
+
+        _sensorType = type;
+        switch (type)
+        {
+            case ACCELEROMETER:
+                setBaudRate(1000000);
+                break;
+            case STRAIN_GAUGE:
+                setBaudRate(115200);
+                break;
+            case LASER_DISTANCE:
+                setBaudRate(115200);
+                break;
+            default:
+                return false; 
+        }
+        return true;
     }
 };
 
